@@ -1,10 +1,11 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Square from "./components/square";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [player, setPlayer] = useState(true);
+  const [bot, setBot] = useState(true);
   const winningPositions = [
     [0,1,2],
     [3,4,5],
@@ -15,7 +16,8 @@ function App() {
     [0,4,8],
     [2,4,6]
   ];
-  let runbot = true;
+  
+  let status;
 
   // Selecting the square
   const chooseSquare = (square) => {
@@ -24,7 +26,33 @@ function App() {
     }
     board[square] = player ? 'X' : 'O';
     setBoard(board);    
-    setPlayer(!player);  
+    setPlayer(!player); 
+
+    // random delay for computer to play
+    let delay = ((Math.random() * 1000) + 200).toFixed();
+    setTimeout (() => {        
+      botChooseSquare(!player);
+    }, delay);  
+  };
+   
+  // Bot selecting the square
+  const botChooseSquare = (player) => {
+    if (checkWin(board)) {
+      return;
+    }
+    // seeing what cells are still empty
+    let array = [];
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] == null) {
+          array.push(i);
+      }
+    }
+    // random number so the computer select a random cell
+    let randomCell = array[Math.floor(Math.random() * array.length)];
+    board[randomCell] = player ? 'X' : 'O';
+    setBoard(board);    
+    setPlayer(!player); 
+    setBot(!bot);
   };
 
   // Checking the winner
@@ -58,10 +86,8 @@ function App() {
       return null;
     }
   };
-
-  const winner = checkWin(board);
-  let status;
   
+  const winner = checkWin(board);
   if (winner) {
     status = `Winner: ${winner}`;
   } else {
@@ -78,6 +104,7 @@ function App() {
   return (
     <div className="App">
       <div className="container">
+        <h1>Tic Tac Toe</h1>
         <div className="board">
           <div className="row">
             <Square 
